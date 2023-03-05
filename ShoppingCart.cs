@@ -8,7 +8,7 @@ namespace GeekTrust
     public class ShoppingCart
     {
         public List<Programme> programmes = new List<Programme>();
-        private Coupon appliedCoupon;
+        public Coupon appliedCoupon;
         public bool IsProMember=false;
         private decimal SubTotal;
         private decimal TotalProDiscount;
@@ -31,19 +31,20 @@ namespace GeekTrust
             }
             return $"{count} programmes added to {programmeCategory} category.";
         }
+        
         public static decimal GetCostOfCheapestProgramme(List<Programme> p)
         {
             return p.OrderBy(o => o.Cost).First().Cost;
         }
         public string AddCoupon(string couponType)
         {
-            appliedCoupon = new Coupon(couponType); 
-            if(programmes.Count > 4)
+            appliedCoupon = couponType switch
             {
-                decimal costOfCheapestProgramme = GetCostOfCheapestProgramme(programmes);
-               
-            }
-            return "";
+                "DEAL_G20" => new DealG20(),
+                "DEAL_G5" => new DealG5(),
+                _ => throw new ArgumentException("invalid coupon category.")
+            };
+            return "Coupon Applied";
         }
         public string AddProMembership()
         {
@@ -54,19 +55,9 @@ namespace GeekTrust
         
         public string printBill(ShoppingCart cart)
         {
-            Billing billing = new Billing(cart);
+            Bill bill = new Bill(cart);
 
-            decimal sub_total = billing.subtotal();
-            decimal coupon_discount = billing.couponDiscount();
-            decimal totalProDiscount = billing.CalculateTotalProDiscount();
-            decimal enrollmentFee = billing.CalculateEnrollmentFee();
-            decimal total = billing.CalculateTotalCost(totalProDiscount);
-            decimal promembershipfees = IsProMember ? 200 : 0;
-
-            return "SUB_TOTAL\n" + sub_total.ToString() + "COUPON_DISCOUNT\n" + coupon_discount.ToString() +
-                   "TOTAL_PRO_DISCOUNT\n" + totalProDiscount.ToString() + "PRO_MEMBERSHIP_FEE\n" +
-                   promembershipfees.ToString() + "ENROLLMENT_FEE\n" + enrollmentFee.ToString() +
-                   "TOTAL\n" + total.ToString() + "";
+            return bill.generateBill();
         }
     }
 }

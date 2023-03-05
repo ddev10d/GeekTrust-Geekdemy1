@@ -15,11 +15,6 @@ namespace GeekTrust.Models
             Code = code;
             DiscountPercentage = discountPercentage;
         }
-
-        public Coupon(string couponType)
-        {
-            CouponType = couponType;
-        }
     }
 
     public class DealG20 : Coupon
